@@ -176,13 +176,71 @@ sleep .3
 done
 ```
 
+# Section elementaire
+#liveness & readiness
+```
+mkdir -p apps/kubefiles/
+vi apps/kubefiles/space-alien-welcome-message-generator.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: space-alien-welcome-message-generator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: space-alien-welcome-message-generator
+  template:
+    metadata:
+      labels:
+        app: space-alien-welcome-message-generator
+    spec:
+      containers:
+      - name: httpd
+        image: httpd:alpine
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          exec:
+            command:
+            - stat
+            - /tmp/ready
+          initialDelaySeconds: 10
+          periodSeconds: 5
+```
+```
+kubectl apply -f apps/kubefiles/space-alien-welcome-message-generator.yml
+```
+```
+watch kubectl get pods
 
-
-
-
-
-
-# Section elementaire 
+```
+```
+NAME                                      READY   STATUS    RESTARTS   AGE
+space-alien-welcome-message-generator-xxxx   0/1     Running   0          Xs
+```
+```
+PODNAME=$(kubectl get pod -l app=space-alien-welcome-message-generator -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -it $PODNAME -- /bin/sh
+```
+```
+touch /tmp/ready
+```
+```
+exit
+```
+```
+watch kubectl get pods
+```
+```
+NAME                                      READY   STATUS    RESTARTS   AGE
+space-alien-welcome-message-generator-xxxx   1/1     Running   0          Xs
+```
+```
+kubectl delete deployment space-alien-welcome-message-generator
+```
 
 # Section intermediaire
 
