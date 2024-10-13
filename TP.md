@@ -320,6 +320,69 @@ kubectl delete service myboot
 
 
 # Section intermediaire
+```
+kubectl create namespace configurator
+```
+```
+mkdir -p apps/kubefiles/
+vi apps/kubefiles/configurator-daemonset.yaml
+```
+```
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: configurator
+  namespace: configurator
+  labels:
+    app: configurator
+spec:
+  selector:
+    matchLabels:
+      app: configurator
+  template:
+    metadata:
+      labels:
+        app: configurator
+    spec:
+      containers:
+      - name: configurator
+        image: bash
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            echo "aba997ac-1c89-4d64" > /configurator/config;
+            sleep 1d;
+        volumeMounts:
+        - name: configurator-volume
+          mountPath: /configurator
+      volumes:
+      - name: configurator-volume
+        hostPath:
+          path: /configurator
+          type: DirectoryOrCreate
+```
+```
+kubectl apply -f apps/kubefiles/configurator-daemonset.yaml
+```
+```
+kubectl get pods -n configurator -o wide
+```
+```
+NAME                     READY   STATUS    RESTARTS   AGE   IP            NODE            NOMINATED NODE   READINESS GATES
+configurator-xxxxxxx      1/1     Running   0          1m    10.244.0.2    kube-node1      <none>           <none>
+configurator-yyyyyyy      1/1     Running   0          1m    10.244.1.2    kube-node2      <none>           <none>
+```
+```
+kubectl exec -it <pod-name> -n configurator -- cat /configurator/config
+```
+```
+aba997ac-1c89-4d64
+```
+```
+kubectl delete daemonset configurator -n configurator
+kubectl delete namespace configurator
+```
+
 
 # Section avancé 
 
