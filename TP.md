@@ -60,6 +60,9 @@ spec:
   type: LoadBalancer
 EOF
 ```
+```
+kubectl get services
+```
 
 
 # Section elementaire 
