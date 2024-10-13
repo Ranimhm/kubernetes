@@ -241,6 +241,83 @@ space-alien-welcome-message-generator-xxxx   1/1     Running   0          Xs
 ```
 kubectl delete deployment space-alien-welcome-message-generator
 ```
+# configmap
+```
+mkdir -p apps/config
+vi apps/config/trauerweide.properties
+```
+```
+tree=trauerweide
+```
+```
+kubectl create configmap trauerweide --from-env-file=apps/config/trauerweide.properties
+```
+```
+kubectl get configmaps
+```
+```
+kubectl get configmap trauerweide -o yaml
+```
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trauerweide
+data:
+  tree: trauerweide
+```
+```
+kubectl describe configmap trauerweide
+```
+```
+vi apps/kubefiles/myboot-deployment-trauerweide.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: myboot
+  name: myboot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: myboot
+  template:
+    metadata:
+      labels:
+        app: myboot
+    spec:
+      containers:
+      - name: myboot
+        image: quay.io/rhdevelopers/myboot:v1  
+        ports:
+          - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: trauerweide
+        resources:
+          requests: 
+            memory: "300Mi" 
+            cpu: "250m"
+          limits:
+            memory: "400Mi"
+            cpu: "1000m"
+```
+```
+kubectl apply -f apps/kubefiles/myboot-deployment-trauerweide.yml
+```
+```
+watch kubectl get pods
+```
+```
+kubectl delete deployment myboot
+kubectl delete configmap trauerweide
+kubectl delete service myboot
+```
+
+
 
 # Section intermediaire
 
