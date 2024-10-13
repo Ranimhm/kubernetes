@@ -320,6 +320,7 @@ kubectl delete service myboot
 
 
 # Section intermediaire
+# Daemonset
 ```
 kubectl create namespace configurator
 ```
@@ -382,7 +383,6 @@ aba997ac-1c89-4d64
 kubectl delete daemonset configurator -n configurator
 kubectl delete namespace configurator
 ```
-
 
 # Section avancé 
 
