@@ -64,6 +64,123 @@ EOF
 kubectl get services
 ```
 
+# déploiement blue/green
+```
+mkdir -p apps/kubefiles/
+vi apps/kubefiles/wonderful-v1.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wonderful
+  name: wonderful-v1
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: wonderful
+      version: v1
+  template:
+    metadata:
+      labels:
+        app: wonderful
+        version: v1
+    spec:
+      containers:
+      - image: httpd:alpine
+        name: httpd
+```
+```
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: wonderful
+  name: wonderful
+spec:
+  ports:
+  - port: 30290
+    protocol: TCP
+    targetPort: 80
+  selector:
+    app: wonderful
+    version: v1
+  type: LoadBalancer
+```
+```
+kubectl apply -f apps/kubefiles/wonderful-v1.yml
+```
+```
+watch kubectl get pods
+```
+```
+IP=$(minikube ip)
+PORT=$(kubectl get service/wonderful -o jsonpath="{.spec.ports[*].nodePort}")
+```
+```
+curl $IP:$PORT
+```
+```
+while true
+do curl $IP:$PORT
+sleep .3
+done
+```
+```
+vi apps/kubefiles/wonderful-v2.yml
+```
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: wonderful
+  name: wonderful-v2
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: wonderful
+      version: v2
+  template:
+    metadata:
+      labels:
+        app: wonderful
+        version: v2
+    spec:
+      containers:
+      - image: nginx:alpine
+        name: nginx
+```
+```
+kubectl apply -f apps/kubefiles/wonderful-v2.yml
+```
+```
+kubectl get pods -l app=wonderful -l version=v2
+```
+```
+kubectl patch svc/wonderful -p '{"spec":{"selector":{"version":"v2"}}}'
+```
+```
+kubectl scale deployment/wonderful-v1 --replicas=0
+```
+```
+curl $IP:$PORT
+```
+```
+while true
+do curl $IP:$PORT
+sleep .3
+done
+```
+
+
+
+
+
+
 
 # Section elementaire 
 
