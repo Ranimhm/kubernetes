@@ -28,6 +28,7 @@ spec:
 EOF
 ```
 # service
+```
 cat <<EOF | kubectl apply -f -
 apiVersion: v1
 kind: Service
@@ -42,6 +43,7 @@ spec:
       targetPort: 80
   type: LoadBalancer
 EOF
+```
 
 # Section elementaire 
 
