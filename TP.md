@@ -4,7 +4,7 @@ Pour définir les Resource Requests et Limits de mon pod, j'ai commencé par cr�
 ```
 kubectl create namespace limit
 ```
-
+# pod
 j'ai crée le pod avec ce script
 
 ```
@@ -27,6 +27,22 @@ spec:
         cpu: "300m"
 EOF
 ```
+# service
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: europe
+spec:
+  selector:
+    app: europe
+  ports:
+    - protocol: TCP
+      port: 30291
+      targetPort: 80
+  type: LoadBalancer
+EOF
+
 # Section elementaire 
 
 # Section intermediaire
