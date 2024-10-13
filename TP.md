@@ -44,6 +44,23 @@ spec:
   type: LoadBalancer
 EOF
 ```
+```
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: asia
+spec:
+  selector:
+    app: asia
+  ports:
+    - protocol: TCP
+      port: 30292
+      targetPort: 80
+  type: LoadBalancer
+EOF
+```
+
 
 # Section elementaire 
 
